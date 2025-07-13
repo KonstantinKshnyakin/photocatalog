@@ -2,10 +2,12 @@ package com.example.photocatalog.service;
 
 import com.example.photocatalog.db.PhotoRepository;
 import com.example.photocatalog.domain.Photo;
+import com.example.photocatalog.ex.PhotoNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class DbPhotoService implements PhotoService{
@@ -29,5 +31,16 @@ public class DbPhotoService implements PhotoService{
     @Override
     public Photo photoByDescription(String description) {
         return null;
+    }
+
+    @Override
+    public Photo byId(UUID id) {
+        return photoRepository.findById(id)
+            .map(pe -> new Photo(
+                pe.getDescription(),
+                pe.getLastModifyDate(),
+                pe.getContent() != null ? new String(pe.getContent()) : ""
+            ))
+            .orElseThrow(() -> new PhotoNotFoundException("das"));
     }
 }
